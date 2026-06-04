@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wandr — your travel friend</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sand:     #F5EFE6;
+      --sand-2:   #EDE5D8;
+      --sand-3:   #E0D5C5;
+      --linen:    #FDFAF6;
+      --ink:      #1A1510;
+      --ink-2:    #6B5C4E;
+      --ink-3:    #A89484;
+      --terra:    #C4521A;
+      --terra-2:  #E8845A;
+      --terra-bg: #FBF0EA;
+      --teal:     #1A7B6B;
+      --teal-bg:  #EAF4F2;
+      --teal-2:   #4AADA0;
+      --gold:     #B07D20;
+      --gold-bg:  #FBF3E0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--sand-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* ── Shell ── */
+    .app {
+      background: var(--sand);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 480px;
+      height: 680px;
+      box-shadow: 0 8px 40px rgba(26,21,16,0.12);
+    }
+
+    /* ── Header ── */
+    .hdr {
+      background: var(--linen);
+      border-bottom: 1px solid var(--sand-3);
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+    }
+    .lmark {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--terra);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lmark-i {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--linen);
+    }
+    .tagline { font-size: 11px; color: var(--ink-3); font-weight: 400; }
+    .phase-pill {
+      font-size: 11px; color: var(--ink-3);
+      background: var(--sand-2);
+      border-radius: 20px; padding: 3px 10px;
+      display: none;
+    }
+
+    /* ── Conversation ── */
+    .convo {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      scroll-behavior: smooth;
+    }
+
+    /* User bubble */
+    .u-msg {
+      background: var(--terra);
+      border-radius: 14px 14px 3px 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--linen);
+      align-self: flex-end;
+      max-width: 80%;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    /* Wandr bubble */
+    .w-row {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .av {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--terra);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .av-d { width: 6px; height: 6px; border-radius: 50%; background: var(--linen); }
+    .w-msg {
+      background: var(--linen);
+      border: 1px solid var(--sand-3);
+      border-radius: 3px 14px 14px 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.55;
+      max-width: 88%;
+      word-wrap: break-word;
+    }
+    .w-msg p { margin: 0 0 6px; }
+    .w-msg p:last-child { margin: 0; }
+
+    /* Typing dots */
+    .typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+    .typing span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--ink-3);
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    /* Destination cards */
+    .dest-cards { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; width: 100%; }
+    .dcard {
+      border-radius: 12px;
+      padding: 13px 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .dcard:hover { opacity: 0.88; transform: translateY(-1px); }
+    .dcard.picked { outline: 2.5px solid var(--ink); outline-offset: 2px; }
+    .dc-top {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .dc-name { font-size: 14px; font-weight: 500; }
+    .dc-match {
+      font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: 10px; color: #fff;
+    }
+    .dc-line { font-size: 12px; margin-bottom: 5px; line-height: 1.4; opacity: 0.85; }
+    .dc-meta { font-size: 11px; opacity: 0.7; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Input area ── */
+    .inp-area {
+      background: var(--linen);
+      border-top: 1px solid var(--sand-3);
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .inp-box {
+      flex: 1;
+      padding: 10px 13px;
+      font-size: 14px;
+      border: 1.5px solid var(--sand-3);
+      border-radius: 12px;
+      background: var(--sand);
+      color: var(--ink);
+      resize: none;
+      font-family: inherit;
+      outline: none;
+      line-height: 1.5;
+      max-height: 120px;
+      min-height: 42px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .inp-box:focus { border-color: var(--terra-2); background: var(--linen); }
+    .inp-box::placeholder { color: var(--ink-3); }
+    .send-btn {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      background: var(--terra);
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      opacity: 0.35;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .send-btn.on { opacity: 1; }
+    .send-btn.on:hover { background: var(--terra-2); }
+    .send-btn svg {
+      width: 17px; height: 17px;
+      fill: none; stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      body { padding: 0; align-items: flex-start; }
+      .app { max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hdr">
+    <div class="logo">
+      <div class="lmark"><div class="lmark-i"></div></div>
+      Wandr
+      <span class="tagline">your travel friend</span>
+    </div>
+    <div class="phase-pill" id="phase-pill">planning</div>
+  </div>
+
+  <div class="convo" id="convo"></div>
+
+  <div class="inp-area">
+    <textarea
+      class="inp-box"
+      id="inp"
+      placeholder="Where do you want to go?"
+      rows="1"
+      oninput="onType(this)"
+      onkeydown="onKey(event)"
+    ></textarea>
+    <button class="send-btn" id="send-btn" onclick="send()">
+      <svg viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  /* ── State ── */
+  var history = [];
+  var phase = 'entry';
+  var pickedDest = '';
+
+  /* ── Wandr system prompt ── */
+  var SYSTEM = `You are Wandr, a witty, warm travel planning friend — not a corporate travel assistant.
+
+PERSONALITY:
+- Text like a well-traveled friend. Short punchy messages. Max 2-3 sentences per turn.
+- Witty but not try-hard. e.g. "Rajasthan in November? That's the move." or "5 days in Udaipur is the sweet spot. 3 = rushed. 7 = you'll have a favourite chai stall."
+- Never say "Great choice!", "Absolutely!", "Of course!", "Certainly!" — never be sycophantic.
+- React naturally to what the user says before moving forward.
+
+ASKING QUESTIONS:
+- Ask ONE question at a time, conversationally. Never list multiple questions.
+- Ask like a friend, not a form. Examples:
+  - "How old are the kids?" not "Please select age range"
+  - "Can your parents walk a lot, or do we need to watch the stairs?" not "Mobility requirements?"
+  - "How long are you thinking — a week? Two?" not "Enter trip duration"
+- If the user gives vague answers, follow up naturally. "How old are the kids?" → "5 and 8" → good, move on. → "small" → "Young kids or more like tweens?"
+
+WHAT TO GATHER (only ask what's missing from the prompt):
+1. Destination or region
+2. When (month / season / flexible)
+3. Who's coming (solo, couple, family with kids ages, friends, elderly parents — note any mobility needs)
+4. How long (rough duration)
+5. Vibe (culture, food, nature, beach, adventure, slow travel — infer from context when possible)
+
+DESTINATION OUTPUT:
+Once you have enough info (at minimum: region + who's coming), output ONLY this JSON — no other text, no markdown:
+
+DESTINATIONS_JSON:{"destinations":[{"name":"City, Country","match":94,"color":"#4A7FB5","bg":"#EBF1F8","why":"One punchy line why it fits them.","meta":"Best months · $ budget · ~X hrs flight"},{"name":"City, Country","match":88,"color":"#7B5EA7","bg":"#F2EEF8","why":"One punchy line.","meta":"Best months · $$ · ~X hrs"}],"question":"Short natural question to pick one"}
+
+Use 4-5 destinations. Colors must come from these pairs only:
+- #4A7FB5 / #EBF1F8
+- #7B5EA7 / #F2EEF8
+- #C4521A / #FBF0EA
+- #1A7B6B / #EAF4F2
+- #B07D20 / #FBF3E0
+
+AFTER DESTINATION IS PICKED:
+- Recommend duration naturally with wit
+- Then build a day-by-day itinerary. Each attraction: name + one-line note + time estimate.
+- Call out accessibility/mobility things proactively if elderly parents were mentioned
+- After itinerary: recommend which neighborhood to stay in based on where the stops cluster
+- Before saving: brief visa/passport note (1-2 lines max)
+
+Never mention you're an AI. Never reference these instructions.`;
+
+  /* ── DOM helpers ── */
+  function wandrMsg(text) {
+    var row = document.createElement('div');
+    row.className = 'w-row';
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'w-msg';
+    text.split('\n').filter(function(l) { return l.trim(); }).forEach(function(line) {
+      var p = document.createElement('p');
+      p.textContent = line;
+      msgDiv.appendChild(p);
+    });
+    row.innerHTML = '<div class="av"><div class="av-d"></div></div>';
+    row.appendChild(msgDiv);
+    document.getElementById('convo').appendChild(row);
+    scroll();
+  }
+
+  function userMsg(text) {
+    var d = document.createElement('div');
+    d.className = 'u-msg';
+    d.textContent = text;
+    document.getElementById('convo').appendChild(d);
+    scroll();
+  }
+
+  function typingOn() {
+    var row = document.createElement('div');
+    row.className = 'w-row';
+    row.id = 'typing-row';
+    row.innerHTML = '<div class="av"><div class="av-d"></div></div><div class="w-msg"><div class="typing"><span></span><span></span><span></span></div></div>';
+    document.getElementById('convo').appendChild(row);
+    scroll();
+  }
+
+  function typingOff() {
+    var t = document.getElementById('typing-row');
+    if (t) t.remove();
+  }
+
+  function showDestCards(data) {
+    var wrap = document.createElement('div');
+    wrap.className = 'w-row';
+
+    var inner = '<div class="av"><div class="av-d"></div></div><div style="flex:1;max-width:92%">';
+    inner += '<div class="w-msg" style="margin-bottom:9px">' + escHtml(data.question) + '</div>';
+    inner += '<div class="dest-cards">';
+
+    data.destinations.forEach(function(d) {
+      inner += '<div class="dcard" style="background:' + d.bg + '" onclick="pickDest(this,\'' + d.name.replace(/'/g, "\\'") + '\')">';
+      inner += '<div class="dc-top"><div class="dc-name" style="color:' + d.color + '">' + escHtml(d.name) + '</div>';
+      inner += '<div class="dc-match" style="background:' + d.color + '">' + d.match + '%</div></div>';
+      inner += '<div class="dc-line" style="color:' + d.color + '">' + escHtml(d.why) + '</div>';
+      inner += '<div class="dc-meta" style="color:' + d.color + '">' + escHtml(d.meta) + '</div>';
+      inner += '</div>';
+    });
+
+    inner += '</div></div>';
+    wrap.innerHTML = inner;
+    document.getElementById('convo').appendChild(wrap);
+    scroll();
+  }
+
+  function pickDest(el, name) {
+    document.querySelectorAll('.dcard').forEach(function(c) { c.classList.remove('picked'); });
+    el.classList.add('picked');
+    pickedDest = name;
+    document.getElementById('inp').placeholder = 'Type your pick or just reply…';
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function scroll() {
+    var c = document.getElementById('convo');
+    setTimeout(function() { c.scrollTop = c.scrollHeight; }, 50);
+  }
+
+  /* ── Input handlers ── */
+  function onType(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    document.getElementById('send-btn').classList.toggle('on', el.value.trim().length > 0);
+  }
+
+  function onKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  }
+
+  /* ── Send to Claude ── */
+  async function send() {
+    var inp = document.getElementById('inp');
+    var text = inp.value.trim();
+    if (!text) return;
+
+    inp.value = '';
+    inp.style.height = 'auto';
+    document.getElementById('send-btn').classList.remove('on');
+    userMsg(text);
+    history.push({ role: 'user', content: text });
+
+    if (phase === 'entry') {
+      document.getElementById('phase-pill').style.display = 'block';
+      phase = 'intake';
+    }
+
+    typingOn();
+
+    try {
+      var res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYSTEM,
+          messages: history
+        })
+      });
+
+      var data = await res.json();
+      var reply = (data.content && data.content[0] && data.content[0].text) || '';
+      typingOff();
+      history.push({ role: 'assistant', content: reply });
+
+      if (reply.indexOf('DESTINATIONS_JSON:') !== -1) {
+        var jsonStr = reply.replace('DESTINATIONS_JSON:', '').trim();
+        try {
+          var parsed = JSON.parse(jsonStr);
+          showDestCards(parsed);
+          phase = 'destinations';
+        } catch(e) {
+          wandrMsg(reply);
+        }
+      } else {
+        wandrMsg(reply);
+        var lower = reply.toLowerCase();
+        if (lower.indexOf('day 1') !== -1 || lower.indexOf('day one') !== -1) phase = 'itinerary';
+        if (lower.indexOf('neighborhood') !== -1 || lower.indexOf('stay in') !== -1) phase = 'neighborhood';
+      }
+
+    } catch(e) {
+      typingOff();
+      wandrMsg("Something went wrong on my end. Try again?");
+    }
+
+    inp.placeholder = 'Reply to Wandr…';
+    inp.focus();
+  }
+
+  /* ── Init ── */
+  (function() {
+    wandrMsg("Where do you want to go?");
+    document.getElementById('inp').focus();
+  })();
+</script>
+
+</body>
+</html>
