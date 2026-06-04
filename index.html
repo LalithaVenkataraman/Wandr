@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wandr — your travel friend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,15 +27,226 @@
       --gold-bg:  #FBF3E0;
     }
 
-    body {
+    html, body {
+      height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: var(--ink);
+    }
+
+    /* ══════════════════════════════════════
+       SCREENS
+    ══════════════════════════════════════ */
+    .screen {
+      position: fixed;
+      inset: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-20px);
+    }
+
+
+    /* ══════════════════════════════════════
+       SCREEN 1 — HOME / SEARCH
+    ══════════════════════════════════════ */
+    #screen-home {
+      background: var(--linen);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 60px 48px;
+    }
+
+    .home-inner {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Heading */
+    .home-heading {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(52px, 7vw, 80px);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.0;
+      letter-spacing: -0.5px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.45s 0.07s ease both;
+    }
+    .home-heading .accent {
+      background: linear-gradient(110deg, var(--terra), var(--terra-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Input row — underline only */
+    .search-wrap {
+      animation: fadeUp 0.45s 0.14s ease both;
+      margin-bottom: 28px;
+      width: 100%;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1.5px solid var(--sand-3);
+      padding-bottom: 12px;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .search-row:focus-within {
+      border-color: var(--ink);
+    }
+
+    .search-inp {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      color: var(--ink);
+      font-family: inherit;
+      outline: none;
+      padding: 0;
+      min-width: 0;
+    }
+    .search-inp::placeholder { color: var(--ink-3); }
+
+    .go-btn {
+      background: var(--ink);
+      color: var(--linen);
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+    .go-btn:hover { background: var(--terra); }
+    .go-btn:active { transform: scale(0.97); }
+
+    .inp-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ink-3);
+      text-align: center;
+    }
+
+    /* Inline suggestions — full-width, page-centered */
+    .suggestions-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      margin-top: 20px;
+      animation: fadeUp 0.45s 0.21s ease both;
+    }
+    .suggestions-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .chip {
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      white-space: nowrap;
+      border-radius: 20px;
+      padding: 6px 13px;
+      border: 1px solid var(--sand-3);
+      color: var(--ink-2);
+      background: transparent;
+      transition: border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--ink-2); color: var(--ink); }
+
+    /* How Wandr works */
+    .steps-row {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+      max-width: 860px;
+      margin-top: 100px;
+      animation: fadeUp 0.45s 0.28s ease both;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+      flex: 1;
+      padding: 0 48px;
+    }
+    .step + .step {
+      border-left: 1px solid var(--sand-3);
+    }
+    .step-num {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 2px;
+    }
+    .step-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: var(--ink-3);
+      line-height: 1.5;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 520px) {
+      #screen-home { padding: 40px 20px; }
+      .home-heading { font-size: 38px; white-space: normal; letter-spacing: -0.5px; }
+      .suggestions-row { flex-wrap: wrap; justify-content: center; padding: 0 16px; }
+      .step { padding: 0 16px; }
+    }
+
+
+    /* ══════════════════════════════════════
+       SCREEN 2 — CHAT
+    ══════════════════════════════════════ */
+    #screen-chat {
       background: var(--sand-2);
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
       padding: 20px;
     }
+    #screen-chat.hidden { transform: translateY(20px); }
 
     /* ── Shell ── */
     .app {
@@ -62,8 +275,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 15px;
+      font-weight: 600;
       color: var(--ink);
       letter-spacing: -0.3px;
     }
@@ -73,18 +286,20 @@
       background: var(--terra);
       display: flex; align-items: center; justify-content: center;
     }
-    .lmark-i {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--linen);
-    }
+    .lmark-i { width: 6px; height: 6px; border-radius: 50%; background: var(--linen); }
     .tagline { font-size: 11px; color: var(--ink-3); font-weight: 400; }
-    .phase-pill {
-      font-size: 11px; color: var(--ink-3);
-      background: var(--sand-2);
-      border-radius: 20px; padding: 3px 10px;
-      display: none;
+
+    .back-btn {
+      font-size: 12px;
+      color: var(--ink-3);
+      background: none;
+      border: 1px solid var(--sand-3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
     }
+    .back-btn:hover { color: var(--terra); border-color: var(--terra-2); }
 
     /* ── Conversation ── */
     .convo {
@@ -231,50 +446,183 @@
 
     /* ── Responsive ── */
     @media (max-width: 520px) {
-      body { padding: 0; align-items: flex-start; }
+      #screen-chat { padding: 0; }
       .app { max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+      .suggestions-row { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
 
-<div class="app">
+<!-- ═══════════════════════════════════════
+     SCREEN 1: HOME
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-home">
 
-  <div class="hdr">
-    <div class="logo">
-      <div class="lmark"><div class="lmark-i"></div></div>
-      Wandr
-      <span class="tagline">your travel friend</span>
+  <div class="home-inner">
+    <h1 class="home-heading">Ready to <span class="accent">Wandr?</span></h1>
+    <div class="search-wrap">
+      <div class="search-row">
+        <input
+          type="text"
+          class="search-inp"
+          id="home-inp"
+          placeholder="Surprise me… or say 'Tokyo in autumn'"
+          autocomplete="off"
+          spellcheck="false"
+          onkeydown="homeKey(event)"
+        />
+        <button class="go-btn" onclick="goWandr()">Let's go</button>
+      </div>
+      <p class="inp-hint">Be as brief or detailed as you like — the more you share, the better we plan.</p>
     </div>
-    <div class="phase-pill" id="phase-pill">planning</div>
   </div>
 
-  <div class="convo" id="convo"></div>
+  <div class="suggestions-row" id="suggestions-row">
+    <span class="suggestions-label">Try</span>
+  </div>
 
-  <div class="inp-area">
-    <textarea
-      class="inp-box"
-      id="inp"
-      placeholder="Where do you want to go?"
-      rows="1"
-      oninput="onType(this)"
-      onkeydown="onKey(event)"
-    ></textarea>
-    <button class="send-btn" id="send-btn" onclick="send()">
-      <svg viewBox="0 0 24 24">
-        <line x1="22" y1="2" x2="11" y2="13"/>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
-    </button>
+  <div class="steps-row">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-label">Describe your trip</div>
+      <div class="step-desc">Where, when, who's coming — just say it naturally.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-label">Pick a destination</div>
+      <div class="step-desc">We suggest places matched to your vibe and crew.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-label">Get your itinerary</div>
+      <div class="step-desc">Day-by-day, tailored. No generic lists.</div>
+    </div>
   </div>
 
 </div>
+
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2: CHAT
+═══════════════════════════════════════ -->
+<div class="screen hidden" id="screen-chat">
+  <div class="app">
+
+    <div class="hdr">
+      <div class="logo">
+        <div class="lmark"><div class="lmark-i"></div></div>
+        Wandr
+        <span class="tagline">your travel friend</span>
+      </div>
+      <button class="back-btn" onclick="goBack()">← Start over</button>
+    </div>
+
+    <div class="convo" id="convo"></div>
+
+    <div class="inp-area">
+      <textarea
+        class="inp-box"
+        id="inp"
+        placeholder="Reply to Wandr…"
+        rows="1"
+        oninput="onType(this)"
+        onkeydown="onKey(event)"
+      ></textarea>
+      <button class="send-btn" id="send-btn" onclick="send()">
+        <svg viewBox="0 0 24 24">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
 
 <script>
   /* ── State ── */
   var history = [];
   var phase = 'entry';
   var pickedDest = '';
+
+  /* ── Screen transitions ── */
+  function goWandr() {
+    var text = document.getElementById('home-inp').value.trim();
+    if (!text) {
+      document.getElementById('home-inp').focus();
+      document.querySelector('.search-row').style.borderColor = 'var(--terra-2)';
+      return;
+    }
+    document.getElementById('screen-home').classList.add('hidden');
+    document.getElementById('screen-chat').classList.remove('hidden');
+    startChat(text);
+  }
+
+  function goBack() {
+    document.getElementById('screen-chat').classList.add('hidden');
+    document.getElementById('screen-home').classList.remove('hidden');
+    document.getElementById('home-inp').value = '';
+    document.getElementById('convo').innerHTML = '';
+    history = [];
+    phase = 'entry';
+    pickedDest = '';
+    renderChips();
+    setTimeout(function() { document.getElementById('home-inp').focus(); }, 400);
+  }
+
+  function homeKey(e) {
+    if (e.key === 'Enter') { e.preventDefault(); goWandr(); }
+  }
+
+  /* ── Suggestion chips pool ── */
+  var CHIP_POOL = [
+    "Japan with kids in July",
+    "Solo trek in Nepal, October",
+    "Family beach holiday, December",
+    "Street food tour in Southeast Asia",
+    "Parents in Rome this spring",
+    "Couple's trip to Bali",
+    "Morocco for a week",
+    "Backpacking South America",
+    "Safari with kids under 10",
+    "Winter escape somewhere warm",
+    "Long weekend in a European city",
+    "Skiing in the Alps with friends",
+    "India — first time, overwhelmed but keen",
+    "New Zealand road trip",
+    "Island hopping in Greece",
+  ];
+
+  function renderChips() {
+    var pool = CHIP_POOL.slice().sort(function() { return Math.random() - 0.5; });
+    var picks = pool.slice(0, 4);
+    var row = document.getElementById('suggestions-row');
+    row.querySelectorAll('.chip').forEach(function(c) { c.remove(); });
+    picks.forEach(function(text) {
+      var span = document.createElement('span');
+      span.className = 'chip';
+      span.textContent = text;
+      span.onclick = function() { useChip(this); };
+      row.appendChild(span);
+    });
+  }
+
+  function useChip(el) {
+    var text = el.textContent.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\s]+/u, '').trim();
+    document.getElementById('home-inp').value = text;
+    document.getElementById('home-inp').focus();
+  }
+
+  /* ── Start chat with first message ── */
+  function startChat(text) {
+    userMsg(text);
+    history.push({ role: 'user', content: text });
+    phase = 'intake';
+    typingOn();
+    callClaude();
+  }
 
   /* ── Wandr system prompt ── */
   var SYSTEM = `You are Wandr, a witty, warm travel planning friend — not a corporate travel assistant.
@@ -363,11 +711,9 @@ Never mention you're an AI. Never reference these instructions.`;
   function showDestCards(data) {
     var wrap = document.createElement('div');
     wrap.className = 'w-row';
-
     var inner = '<div class="av"><div class="av-d"></div></div><div style="flex:1;max-width:92%">';
     inner += '<div class="w-msg" style="margin-bottom:9px">' + escHtml(data.question) + '</div>';
     inner += '<div class="dest-cards">';
-
     data.destinations.forEach(function(d) {
       inner += '<div class="dcard" style="background:' + d.bg + '" onclick="pickDest(this,\'' + d.name.replace(/'/g, "\\'") + '\')">';
       inner += '<div class="dc-top"><div class="dc-name" style="color:' + d.color + '">' + escHtml(d.name) + '</div>';
@@ -376,7 +722,6 @@ Never mention you're an AI. Never reference these instructions.`;
       inner += '<div class="dc-meta" style="color:' + d.color + '">' + escHtml(d.meta) + '</div>';
       inner += '</div>';
     });
-
     inner += '</div></div>';
     wrap.innerHTML = inner;
     document.getElementById('convo').appendChild(wrap);
@@ -399,7 +744,7 @@ Never mention you're an AI. Never reference these instructions.`;
     setTimeout(function() { c.scrollTop = c.scrollHeight; }, 50);
   }
 
-  /* ── Input handlers ── */
+  /* ── Chat input handlers ── */
   function onType(el) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
@@ -415,20 +760,17 @@ Never mention you're an AI. Never reference these instructions.`;
     var inp = document.getElementById('inp');
     var text = inp.value.trim();
     if (!text) return;
-
     inp.value = '';
     inp.style.height = 'auto';
     document.getElementById('send-btn').classList.remove('on');
     userMsg(text);
     history.push({ role: 'user', content: text });
-
-    if (phase === 'entry') {
-      document.getElementById('phase-pill').style.display = 'block';
-      phase = 'intake';
-    }
-
     typingOn();
+    await callClaude();
+    inp.focus();
+  }
 
+  async function callClaude() {
     try {
       var res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -440,7 +782,6 @@ Never mention you're an AI. Never reference these instructions.`;
           messages: history
         })
       });
-
       var data = await res.json();
       var reply = (data.content && data.content[0] && data.content[0].text) || '';
       typingOff();
@@ -452,30 +793,22 @@ Never mention you're an AI. Never reference these instructions.`;
           var parsed = JSON.parse(jsonStr);
           showDestCards(parsed);
           phase = 'destinations';
-        } catch(e) {
-          wandrMsg(reply);
-        }
+        } catch(e) { wandrMsg(reply); }
       } else {
         wandrMsg(reply);
         var lower = reply.toLowerCase();
         if (lower.indexOf('day 1') !== -1 || lower.indexOf('day one') !== -1) phase = 'itinerary';
         if (lower.indexOf('neighborhood') !== -1 || lower.indexOf('stay in') !== -1) phase = 'neighborhood';
       }
-
     } catch(e) {
       typingOff();
       wandrMsg("Something went wrong on my end. Try again?");
     }
-
-    inp.placeholder = 'Reply to Wandr…';
-    inp.focus();
   }
 
   /* ── Init ── */
-  (function() {
-    wandrMsg("Where do you want to go?");
-    document.getElementById('inp').focus();
-  })();
+  renderChips();
+  document.getElementById('home-inp').focus();
 </script>
 
 </body>
